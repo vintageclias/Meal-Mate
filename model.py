@@ -2,21 +2,21 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class User(db.Model): #using this for authentication 
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False) 
     password = db.Column(db.String(100), nullable=False)
-    recipes = db.relationship('Recipe', backref='author', lazy=True)  # One-to-many relationship: one user can have many recipes
-    meals = db.relationship('Meal', backref='author', lazy=True) # One-to-many relationship: one user can have many meal plans
+    recipes = db.relationship('Recipe', backref='author', lazy=True)  
+    meals = db.relationship('Meal', backref='author', lazy=True) 
 
 class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     ingredients = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # a foreign key pointing to the User's id (each recipe belongs to a user)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  
 
     
- # Meal Plan model with many-to-many relationship (users and recipes)
+ 
 class Meal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)

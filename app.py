@@ -5,22 +5,22 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from model import db, User, Recipe, Meal 
 from datetime import datetime
 
-# Initialization of  the Flask app, SQLAlchemy, Migrate, and JWT
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mealmate.db'  
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your-secret-key'  # Change this for production
+app.config['SECRET_KEY'] = 'your-secret-key'  
 db.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
 
-# Routes for user authentication
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
     if User.query.filter_by(username=data['username']).first():
         return jsonify(message="User already exists"), 400
-    new_user = User(username=data['username'], password=data['password'])  # Password should be hashed in production
+    new_user = User(username=data['username'], password=data['password']) 
     db.session.add(new_user)
     db.session.commit()
     return jsonify(message="User registered successfully"), 201
@@ -34,7 +34,7 @@ def login():
         return jsonify(access_token=token)
     return jsonify(message="Invalid credentials"), 401
 
-# CRUD operations for Recipes
+
 @app.route('/recipes', methods=['GET'])
 @jwt_required()
 def get_recipes():
@@ -75,7 +75,7 @@ def delete_recipe(recipe_id):
     db.session.commit()
     return jsonify(message="Recipe deleted successfully")
 
-# CRUD operations for Meals
+
 @app.route('/meals', methods=['GET'])
 @jwt_required()
 def get_meals():
@@ -117,6 +117,6 @@ def delete_meal(meal_id):
     db.session.commit()
     return jsonify(message="Meal deleted successfully")
 
-# Main entry point
+
 if __name__ == '__main__':
     app.run(debug=True)
