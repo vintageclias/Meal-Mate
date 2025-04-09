@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import Home from './pages/Home';
 import Recipes from './pages/Recipes';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import Profile from './pages/Profile';
 import MealCalendar from './pages/MealCalendar';
 import RecipeDetails from './components/RecipeDetails';
@@ -120,6 +121,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/recipes" element={<Recipes />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/calendar" element={<MealCalendar />} />
           <Route path="/recipes/:id" element={<RecipeDetails />} />

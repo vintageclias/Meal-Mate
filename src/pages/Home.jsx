@@ -1,6 +1,19 @@
 import './Home.css';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { 
+  FaArrowRight, 
+  FaCalendarAlt, 
+  FaChartLine, 
+  FaUtensils, 
+  FaCoffee, 
+  FaAppleAlt, 
+  FaCookieBite,
+  FaFacebook, 
+  FaTwitter, 
+  FaInstagram, 
+  FaPinterest 
+} from 'react-icons/fa';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -29,7 +42,9 @@ export default function Home() {
         </div>
         <h1 className="hero-title">Meal Mate</h1>
         <p className="hero-subtitle">Your personal meal planning assistant, GOOD FOOD GOOD LIFE</p>
-        <button onClick={handleGetStarted} className="cta-button">Get Started</button>
+        <button onClick={handleGetStarted} className="cta-button">
+          Get Started <FaArrowRight className="icon-right" />
+        </button>
       </section>
 
       <div className="features">
@@ -51,7 +66,8 @@ export default function Home() {
             className="feature-image"
           />
           <div className="feature-content">
-            <h3 className="feature-title">Meal Planning</h3>
+          <FaCalendarAlt className="feature-icon" />
+          <h3 className="feature-title">Meal Planning</h3>
             <p className="feature-description">
               Plan your meals for the week with our intuitive calendar interface.
             </p>
@@ -65,7 +81,8 @@ export default function Home() {
             className="feature-image"
           />
           <div className="feature-content">
-            <h3 className="feature-title">Nutrition Tracking</h3>
+          <FaChartLine className="feature-icon" />
+          <h3 className="feature-title">Nutrition Tracking</h3>
             <p className="feature-description">
               Monitor your nutritional intake with our comprehensive tracking system.
             </p>
@@ -79,7 +96,8 @@ export default function Home() {
             className="feature-image"
           />
           <div className="feature-content">
-            <h3 className="feature-title">Meal Prep</h3>
+          <FaUtensils className="feature-icon" />
+          <h3 className="feature-title">Meal Prep</h3>
             <p className="feature-description">
               Get step-by-step guidance for preparing healthy meals in advance.
             </p>
@@ -93,7 +111,8 @@ export default function Home() {
             className="feature-image"
           />
           <div className="feature-content">
-            <h3 className="feature-title">Morning Boost</h3>
+          <FaCoffee className="feature-icon" />
+          <h3 className="feature-title">Morning Boost</h3>
             <p className="feature-description">
               Start your day right with perfectly planned breakfasts.
             </p>
@@ -107,7 +126,8 @@ export default function Home() {
             className="feature-image"
           />
           <div className="feature-content">
-            <h3 className="feature-title">Fresh Fruits</h3>
+          <FaAppleAlt className="feature-icon" />
+          <h3 className="feature-title">Fresh Fruits</h3>
             <p className="feature-description">
               Enjoy seasonal fruits for a healthy boost.
             </p>
@@ -121,7 +141,8 @@ export default function Home() {
             className="feature-image"
           />
           <div className="feature-content">
-            <h3 className="feature-title">Healthy Snacks</h3>
+          <FaCookieBite className="feature-icon" />
+          <h3 className="feature-title">Healthy Snacks</h3>
             <p className="feature-description">
               Nutritious snacks to keep you energized.
             </p>
@@ -147,7 +168,9 @@ export default function Home() {
         <div className="footer-content">
           <div className="footer-brand">
             <h3>MealMate</h3>
-            <p>Your personal meal planning assistant helping you eat better and live healthier.</p>
+            <p>MealMate is your ultimate companion for smart and simple meal planning. Designed with health-conscious individuals and busy households in mind, MealMate helps you discover, plan, and save your favorite recipes—all in one place.
+
+Whether you're trying to stay on track with your diet, looking for fresh culinary inspiration, or just want to make grocery shopping easier, MealMate has you covered. Our intuitive interface allows you to search for recipes, view detailed ingredients and instructions, and save meals you love for quick access later..</p>
           </div>
           
           <div className="footer-links">
@@ -163,10 +186,10 @@ export default function Home() {
         </div>
 
         <div className="footer-social">
-          <a href="#" className="social-icon"><i className="fab fa-facebook"></i></a>
-          <a href="#" className="social-icon"><i className="fab fa-twitter"></i></a>
-          <a href="#" className="social-icon"><i className="fab fa-instagram"></i></a>
-          <a href="#" className="social-icon"><i className="fab fa-pinterest"></i></a>
+          <a href="#" className="social-icon"><FaFacebook /></a>
+          <a href="#" className="social-icon"><FaTwitter /></a>
+          <a href="#" className="social-icon"><FaInstagram /></a>
+          <a href="#" className="social-icon"><FaPinterest /></a>
         </div>
       </footer>
     </div>

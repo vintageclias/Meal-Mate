@@ -1,13 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './ModernRecipes.css';
 import '../components/EmptyState.css';
-import { recipes } from '../data/recipes';
+import { getRecipes } from '../api/recipes_service_v2';
 import SearchBar from '../components/SearchBar';
 import ModernRecipeCard from '../components/ModernRecipeCard';
 
 export default function Recipes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [saved, setSaved] = useState([]);
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const token = localStorage.getItem('token'); // Get token from storage
+        const { recipes } = await getRecipes(token);
+        setRecipes(recipes || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecipes();
+  }, []);
 
   const handleSearch = (term) => setSearchTerm(term);
   const handleSave = (recipe) => {
@@ -18,12 +36,15 @@ export default function Recipes() {
     );
   };
 
+  if (loading) return <div className="recipes-page">Loading...</div>;
+  if (error) return <div className="recipes-page">Error: {error}</div>;
+
   const filtered = recipes.filter(r =>
-    r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.category.toLowerCase().includes(searchTerm.toLowerCase())
+    r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (r.category && r.category.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const categories = ['Breakfast', 'Lunch', 'Dinner'];
+  const categories = [...new Set(recipes.map(r => r.category || 'Uncategorized'))];
 
   return (
     <div className="recipes-page">
