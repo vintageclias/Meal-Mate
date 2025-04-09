@@ -10,6 +10,7 @@ flask-migrate = "*"
 flask-jwt-extended = "*"
 werkzeug = "*"
 python-dotenv = "*"
+flask-cors = "*"
 
 [dev-packages]
 

@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from model import db, User, Recipe, Meal 
 from datetime import datetime
+from flask_cors import CORS
 
 
 app = Flask(__name__)
