@@ -50,11 +50,23 @@ def get_recipes():
 
 @app.route('/recipes', methods=['POST'])
 def add_recipe():
-    data = request.get_json()
-    new_recipe = Recipe(title=data['title'], ingredients=data['ingredients'], instructions=data['instructions'], user_id=data['user_id'])
-    db.session.add(new_recipe)
-    db.session.commit()
-    return jsonify(message="Recipe added successfully"), 201
+    try:
+        data = request.get_json()
+        if not all(key in data for key in ['title', 'ingredients', 'user_id']):
+            return jsonify({"error": "Missing required fields"}), 400
+            
+        new_recipe = Recipe(
+            title=data['title'],
+            ingredients=data['ingredients'],
+            instructions=data.get('instructions', ''),
+            user_id=data['user_id']
+        )
+        db.session.add(new_recipe)
+        db.session.commit()
+        return jsonify(message="Recipe added successfully"), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/recipes/<int:recipe_id>', methods=['GET'])
 def get_recipe_by_id(recipe_id):
@@ -86,11 +98,26 @@ def get_meals():
 
 @app.route('/meals', methods=['POST'])
 def add_meal():
-    data = request.get_json()
-    new_meal = Meal(date=data['date'], user_id=data['user_id'], recipe_id=data['recipe_id'], notes=data['notes'])
-    db.session.add(new_meal)
-    db.session.commit()
-    return jsonify(message="Meal added successfully"), 201
+    try:
+        data = request.get_json()
+        if not all(key in data for key in ['date', 'user_id', 'recipe_id']):
+            return jsonify({"error": "Missing required fields"}), 400
+            
+        new_meal = Meal(
+            name=data.get('name', ''),
+            date=datetime.strptime(data['date'], '%Y-%m-%d'),
+            user_id=data['user_id'],
+            recipe_id=data['recipe_id'],
+            notes=data.get('notes', '')
+        )
+        db.session.add(new_meal)
+        db.session.commit()
+        return jsonify(message="Meal added successfully"), 201
+    except ValueError as e:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/meals/<int:meal_id>', methods=['GET'])
 def get_meal_by_id(meal_id):
