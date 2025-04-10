@@ -1,3 +1,3 @@
 // Default API configuration
-const API_URL = ""; // Using relative paths with Vite proxy
+const API_URL = "/api"; // Using Vite proxy
 export default API_URL;

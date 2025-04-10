@@ -1,6 +1,50 @@
-import './Login.css'; // Reusing the same styles
+import { useState } from 'react';
+import './Login.css';
+import { register, login } from '../api/authService';
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup({ onLogin }) {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    
+    const username = e.target.name.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    try {
+      const result = await register({ username, email, password });
+      console.log('Registration response:', result);
+      
+      if (result && result.message === "User registered successfully") {
+        // Auto-login after successful registration
+        const loginResult = await login({ email, password });
+        if (loginResult && loginResult.message === "Login successful") {
+          onLogin({
+            name: username,
+            email,
+            id: loginResult.user_id
+          });
+          navigate('/', { state: { successMessage: "Account created successfully! You are now logged in." } });
+        } else {
+          setError("Account created but automatic login failed. Please login manually.");
+        }
+      } else {
+        setError(result?.message || "Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError(error.message || "An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="login-container">
       <img 
@@ -9,15 +53,8 @@ export default function Signup({ onLogin }) {
         className="login-logo" 
       />
       <h1 className="login-title">Create Your Meal Mate Account</h1>
-      <form className="login-form" onSubmit={(e) => {
-        e.preventDefault();
-        const mockProfile = {
-          name: 'New User',
-          email: formData.email,
-          avatar: null
-        };
-        onLogin(mockProfile);
-      }}>
+      {error && <div className="error-message">{error}</div>}
+      <form className="login-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="name">Name</label>
           <input
