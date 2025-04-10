@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import './MealCalendar.css';
+import { getCurrentUser } from '../api/authService';
 import DaySelectionModal from '../components/DaySelectionModal';
 import MealItem from '../components/MealItem';
 import MealDropTarget from '../components/MealDropTarget';
 import MealModal from './MealModal';
 
 export default function MealCalendar({ mealData }) {
+  const currentUser = getCurrentUser();
   const [searchTerm, setSearchTerm] = useState('');
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const [assignedMeals, setAssignedMeals] = useState(
@@ -16,7 +18,7 @@ export default function MealCalendar({ mealData }) {
   const [showDayModal, setShowDayModal] = useState(false);
   const [mealToAdd, setMealToAdd] = useState(null);
 
-  const filteredMeals = Object.keys(mealData).filter(meal =>
+  const filteredMeals = Object.keys(mealData || {}).filter(meal =>
     meal.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -39,6 +41,11 @@ export default function MealCalendar({ mealData }) {
     <div className="calendar-container">
       <div className="meal-selection">
         <h2>Meal Library</h2>
+        {currentUser ? (
+          <h3 className="welcome-message">Welcome, {currentUser.username}!</h3>
+        ) : (
+          <h3 className="welcome-message">Welcome to MealMate! Please log in to access your personalized meal calendar and start planning your delicious week.</h3>
+        )}
         <div className="search-container">
           <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

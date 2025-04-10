@@ -1,38 +1,73 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Profile.css';
+import { getCurrentUser } from '../api/authService';
 
 export default function Profile() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState({
-    name: 'Alex Johnson',
-    joinDate: 'January 2023',
-    mealsPlanned: 127,
-    dietaryPreferences: ['Vegetarian', 'Nut-free', 'Lactose-free', 'Gluten-free'],
+    name: '',
+    joinDate: '',
+    mealsPlanned: 0,
+    dietaryPreferences: [],
     avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYQkECjYxaNxAyDFPjU8Y2uoYuj4pmsPx3mw&s'
   });
 
   useEffect(() => {
-    // Check login status from localStorage
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    setIsLoggedIn(loggedIn);
-    
-    if (loggedIn) {
-      const savedProfile = localStorage.getItem('profile');
-      if (savedProfile) {
-        setProfile(JSON.parse(savedProfile));
+    const checkLoginAndFetchData = async () => {
+      const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      setIsLoggedIn(loggedIn);
+      
+      if (loggedIn) {
+        setIsLoading(true);
+        try {
+          const user = await getCurrentUser();
+          if (user) {
+            setProfile({
+              name: user.username || '',
+              joinDate: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A',
+              mealsPlanned: user.mealCount || 0,
+              dietaryPreferences: user.dietaryPreferences || [],
+              avatar: user.avatar || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYQkECjYxaNxAyDFPjU8Y2uoYuj4pmsPx3mw&s'
+            });
+          }
+        } catch (error) {
+          console.error('Failed to fetch user data:', error);
+        } finally {
+          setIsLoading(false);
+        }
       }
-    }
+    };
+
+    checkLoginAndFetchData();
   }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    localStorage.setItem('profile', JSON.stringify(profile));
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          username: profile.name,
+          dietaryPreferences: profile.dietaryPreferences
+        })
+      });
+      
+      if (response.ok) {
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+    }
   };
 
   const handleChange = (e) => {
@@ -64,6 +99,14 @@ export default function Profile() {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="profile-container">
+        <div className="loading-message">Loading profile...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="profile-container">
       <div className="profile-header">
@@ -90,7 +133,7 @@ export default function Profile() {
             </>
           ) : (
             <>
-              <h1>{profile.name}</h1>
+              <h1>{profile.name || 'User'}</h1>
               <p>Member since: {profile.joinDate}</p>
               <p>Meals planned: {profile.mealsPlanned}</p>
               <button onClick={handleEdit} className="edit-button">
