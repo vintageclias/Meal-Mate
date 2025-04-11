@@ -3,9 +3,9 @@ services:
     name: meal-mate-backend
     runtime: python
     buildCommand: |
-      pip install -r requirements.txt
-      cd ../meal-mate-frontend && npm install && npm run build
-    startCommand: gunicorn wsgi:app
+      cd backend && pip install -r requirements.txt
+    startCommand: |
+      cd backend && gunicorn wsgi:app
     envVars:
       - key: FLASK_ENV
         value: production
@@ -13,9 +13,9 @@ services:
         value: sqlite:///instance/mealmate.db
       - key: SECRET_KEY
         generateValue: true
-    staticSites:
-      - name: meal-mate-frontend
-        buildCommand: |
-          npm install
-          npm run build
-        staticFilesPath: meal-mate-frontend/dist
+
+  - type: static
+    name: meal-mate-frontend
+    buildCommand: |
+      cd meal-mate-frontend && npm install && npm run build
+    staticFilesPath: meal-mate-frontend/dist
