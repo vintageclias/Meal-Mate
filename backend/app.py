@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -7,7 +8,8 @@ from datetime import datetime
 from model import db, User, Recipe, Meal
 
 app = Flask(__name__)
-# Configure CORS based on environment
+
+# CORS configuration
 if os.environ.get('FLASK_ENV') == 'production':
     CORS(app, resources={
         r"/*": {
@@ -27,6 +29,7 @@ else:
         }
     })
 
+# CORS preflight
 @app.route('/login', methods=['OPTIONS'])
 def login_options():
     return '', 200
@@ -35,6 +38,7 @@ def login_options():
 def register_options():
     return '', 200
 
+# Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mealmate.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your-secret-key'
@@ -87,7 +91,6 @@ def login():
             if not data or 'password' not in data:
                 return jsonify({"error": "Password is required"}), 400
 
-            # Accept multiple field names for username/email
             username_or_email = data.get('username_or_email') or data.get('email') or data.get('username')
             if not username_or_email:
                 return jsonify({"error": "Username or email is required"}), 400
@@ -254,6 +257,12 @@ def delete_meal(meal_id):
     db.session.delete(meal)
     db.session.commit()
     return jsonify(message="Meal deleted successfully")
+
+# ---------------- ROOT ROUTE ---------------- #
+
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"message": "Welcome to the Meal Mate API!"}), 200
 
 # ---------------- RUN APP ---------------- #
 
