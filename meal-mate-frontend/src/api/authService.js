@@ -36,7 +36,7 @@ export const login = async (credentials) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username_or_email: credentials.username || credentials.email,
+        username_or_email: credentials.email,
         password: credentials.password
       }),
     });
@@ -51,7 +51,9 @@ export const login = async (credentials) => {
       throw new Error("Invalid response from server");
     }
 
-    // Store user data in localStorage
+    // Store auth data in localStorage
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify({
       id: data.user_id,
       username: data.username,
@@ -66,10 +68,43 @@ export const login = async (credentials) => {
 };
 
 export const logout = () => {
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('token');
   localStorage.removeItem('user');
 };
 
-export const getCurrentUser = () => {
-  const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
+export const getCurrentUser = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user data");
+    }
+
+    const data = await response.json();
+    
+    // Update localStorage with fresh data
+    localStorage.setItem('user', JSON.stringify({
+      id: data.id,
+      username: data.username,
+      email: data.email,
+      createdAt: data.createdAt,
+      mealCount: data.mealCount,
+      dietaryPreferences: data.dietaryPreferences,
+      avatar: data.avatar
+    }));
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    // Fallback to localStorage if API fails
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  }
 };

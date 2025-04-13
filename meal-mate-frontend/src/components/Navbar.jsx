@@ -21,7 +21,13 @@ export default function Navbar({ user, onLogout }) {
           {successMessage}
         </div>
       )}
-      {/* Rest of your Navbar content */}
+      <div className="profile-pic">
+        {user ? (
+          <span>{user.username.charAt(0).toUpperCase()}</span>
+        ) : (
+          <span className="placeholder"> </span> // Placeholder for empty state
+        )}
+      </div>
     </nav>
   );
 }

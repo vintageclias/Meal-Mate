@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Login.css';
-import { login } from '../api/authService';
+import { login, logout } from '../api/authService';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    setIsLoggedIn(loggedIn);
+    if (loggedIn) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      setUsername(user?.username || '');
+    }
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setIsLoggedIn(false);
+    setUsername('');
+    navigate('/login');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,36 +61,59 @@ export default function Login({ onLogin }) {
         alt="Meal Mate" 
         className="login-logo" 
       />
-      <h1 className="login-title">Welcome Back To Meal Mate</h1>
-      {error && <div className="error-message">{error}</div>}
-      <form className="login-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            className="form-control"
-            placeholder="Enter your email"
-            required
-          />
+      {isLoggedIn ? (
+        <div className="logged-in-view">
+          <h1 className="login-title">Welcome back, {username}!</h1>
+          <p className="welcome-message">You are already logged in.</p>
+          <div className="logged-in-actions">
+            <button 
+              onClick={() => navigate('/profile')}
+              className="profile-btn"
+            >
+              View Profile
+            </button>
+            <button 
+              onClick={handleLogout}
+              className="logout-btn"
+            >
+              Logout
+            </button>
+          </div>
         </div>
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            className="form-control"
-            placeholder="Enter your password"
-            required
-          />
-        </div>
-        <button type="submit" className="login-btn">
-          Sign In
-        </button>
-      </form>
-      <p className="signup-link">
-        Don't have an account? <a href="/signup">Sign up</a>
-      </p>
+      ) : (
+        <>
+          <h1 className="login-title">Welcome Back To Meal Mate</h1>
+          {error && <div className="error-message">{error}</div>}
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                className="form-control"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                className="form-control"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <button type="submit" className="login-btn">
+              Sign In
+            </button>
+          </form>
+          <p className="signup-link">
+            Don't have an account? <a href="/signup">Sign up</a>
+          </p>
+        </>
+      )}
     </div>
   );
 }

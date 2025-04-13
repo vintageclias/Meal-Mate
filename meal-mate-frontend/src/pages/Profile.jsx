@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import './Profile.css';
 import { getCurrentUser } from '../api/authService';
 
+const API_BASE_URL = 'http://localhost:5000';
+
 export default function Profile() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -12,7 +14,7 @@ export default function Profile() {
     joinDate: '',
     mealsPlanned: 0,
     dietaryPreferences: [],
-    avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYQkECjYxaNxAyDFPjU8Y2uoYuj4pmsPx3mw&s'
+    avatar: ''
   });
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function Profile() {
               joinDate: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A',
               mealsPlanned: user.mealCount || 0,
               dietaryPreferences: user.dietaryPreferences || [],
-              avatar: user.avatar || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYQkECjYxaNxAyDFPjU8Y2uoYuj4pmsPx3mw&s'
+              avatar: user.avatar || ''
             });
           }
         } catch (error) {
@@ -49,24 +51,62 @@ export default function Profile() {
   };
 
   const handleSave = async () => {
+    if (!profile.name.trim()) {
+      alert('Please enter a valid name');
+      return;
+    }
+
     try {
-      const response = await fetch('/api/user/profile', {
+      setIsLoading(true);
+      const response = await fetch('/api/user/profile', { 
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
-          username: profile.name,
+          username: profile.name.trim(),
           dietaryPreferences: profile.dietaryPreferences
         })
       });
       
-      if (response.ok) {
-        setIsEditing(false);
+      const responseText = await response.text(); // Get the response as text
+      console.log('Profile update response:', {
+        status: response.status,
+        text: responseText // Log the raw response text
+      });
+      
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText); // Try to parse as JSON
+      } catch (e) {
+        // If parsing fails, show the raw response
+        throw new Error(`Server returned non-JSON response: ${responseText.substring(0, 100)}...`);
       }
+      
+      if (!response.ok) {
+        // Handle structured error responses from backend
+        const errorMsg = responseData.error || 
+                        responseData.message || 
+                        'Failed to save profile';
+        const details = responseData.details ? `\nDetails: ${responseData.details}` : '';
+        throw new Error(`${errorMsg}${details}`);
+      }
+
+      // Update profile with response data
+      setProfile(prev => ({
+        ...prev,
+        name: responseData.user?.username || prev.name,
+        dietaryPreferences: prev.dietaryPreferences // Keep existing preferences
+      }));
+      
+      setIsEditing(false);
+      alert(responseData.message || 'Profile updated successfully!');
     } catch (error) {
-      console.error('Failed to save profile:', error);
+      console.error('Profile update error:', error);
+      alert(`Failed to update profile: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -110,11 +150,9 @@ export default function Profile() {
   return (
     <div className="profile-container">
       <div className="profile-header">
-        <img 
-          src={profile.avatar} 
-          alt="Profile" 
-          className="profile-avatar"
-        />
+        <div className="profile-avatar-letter">
+          {profile.name ? profile.name.charAt(0).toUpperCase() : 'U'}
+        </div>
         <div className="profile-info">
           {isEditing ? (
             <>

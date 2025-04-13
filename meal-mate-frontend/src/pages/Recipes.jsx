@@ -1,17 +1,35 @@
 import { useEffect, useState } from 'react';
-import { getRecipes } from '../api/recipes_service';
+import { getRecipes, toggleFavoriteRecipe } from '../api/recipes_service';
+import { Link } from 'react-router-dom';
 import './Recipes.css';
 import placeholderImage from '../assets/meal-mate-logo.png';
 import SearchBar from '../components/SearchBar';
 
 export default function Recipes() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [favorites, setFavorites] = useState([]);
+
+  const handleFavorite = async (recipeId) => {
+    try {
+      await toggleFavoriteRecipe(recipeId);
+      setFavorites(prev => 
+        prev.includes(recipeId) 
+          ? prev.filter(id => id !== recipeId)
+          : [...prev, recipeId]
+      );
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
 
   useEffect(() => {
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    setIsLoggedIn(loggedIn);
+    
     const fetchRecipes = async () => {
       try {
         const data = await getRecipes();
@@ -25,75 +43,61 @@ export default function Recipes() {
       }
     };
     
-    fetchRecipes();
+    if (loggedIn) {
+      fetchRecipes();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => {
-    console.log('Search term changed:', searchTerm);
-    const results = recipes.filter(recipe => {
-      const matches = recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
-      console.log(`Recipe "${recipe.title}" matches:`, matches);
-      return matches;
-    });
-    console.log('Filtered results:', results);
-    setFilteredRecipes(results);
-  }, [searchTerm, recipes]);
-
-  const formatList = (text) => {
-    if (!text) return '';
-    return text.split('\n').map((item, i) => (
-      <li key={i}>{item}</li>
-    ));
-  };
+  const filteredRecipes = recipes.filter(recipe =>
+    recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    recipe.ingredients.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="recipes-container">
       <h1>Our Recipes</h1>
-      
-      {loading ? (
-        <div className="loading">
-          <div className="spinner"></div>
-          <p>Loading delicious recipes...</p>
+      {!isLoggedIn ? (
+        <div className="login-prompt">
+          <h2>Please login or signup to view and search recipes</h2>
+          <div className="auth-links">
+            <Link to="/login" className="auth-link">Login</Link>
+            <span> or </span>
+            <Link to="/signup" className="auth-link">Sign Up</Link>
+          </div>
         </div>
-      ) : error ? (
-        <div className="error-message">{error}</div>
+      ) : loading ? (
+        <div className="loading">Loading recipes...</div>
       ) : (
-        <div className="recipe-grid">
-          {recipes.map(recipe => (
-            <div key={recipe.id} className="recipe-card">
-              <div className="recipe-image-container">
-                <img 
-                  src={recipe.image || placeholderImage} 
-                  alt={recipe.title}
-                  className="recipe-image"
-                />
+        <>
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search recipes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          <div className="recipe-grid">
+            {filteredRecipes.map(recipe => (
+              <div key={recipe.id} className="recipe-card">
+                <h3>{recipe.title}</h3>
+                <h4>Ingredients</h4>
+                <p>{recipe.ingredients}</p>
+                <h4>Instructions</h4>
+                <p>{recipe.instructions}</p>
+                <button 
+                  className={`favorite-btn ${favorites.includes(recipe.id) ? 'favorited' : ''}`}
+                  onClick={() => handleFavorite(recipe.id)}
+                >
+                  {favorites.includes(recipe.id) ? '★' : '☆'}
+                </button>
               </div>
-              <div className="recipe-content">
-                <h3 className="recipe-title">{recipe.title}</h3>
-                
-                {recipe.cookTime && (
-                  <div className="recipe-meta">
-                    <span>⏱️ {recipe.cookTime}</span>
-                  </div>
-                )}
-
-                <div className="recipe-section">
-                  <h4>Ingredients</h4>
-                  <ul className="recipe-list">
-                    {formatList(recipe.ingredients)}
-                  </ul>
-                </div>
-
-                <div className="recipe-section">
-                  <h4>Instructions</h4>
-                  <ol className="recipe-list">
-                    {formatList(recipe.instructions)}
-                  </ol>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
