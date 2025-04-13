@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import ModernRecipeCard from '../components/ModernRecipeCard';
+import { Link } from 'react-router-dom';
 import './FavoriteRecipes.css';
 import { getFavoriteRecipes } from '../api/recipes_service';
 import { getCurrentUser } from '../api/authService';
 
 export default function FavoriteRecipes() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [saved, setSaved] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,12 +28,19 @@ export default function FavoriteRecipes() {
   };
 
   useEffect(() => {
-    fetchFavorites();
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    setIsLoggedIn(loggedIn);
+    
+    if (loggedIn) {
+      fetchFavorites();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const handleSave = async (recipe) => {
     try {
-      await fetchFavorites(); // Refresh the list after saving
+      await fetchFavorites();
     } catch (err) {
       setError(err.message);
     }
@@ -43,16 +52,26 @@ export default function FavoriteRecipes() {
   return (
     <div className="favorites-container">
       <h2 className="favorites-title">Your Favorite Recipes</h2>
-      {saved.length === 0 ? (
+      
+      {!isLoggedIn ? (
+        <div className="login-prompt">
+          <div className="empty-state">
+            <h3>Please sign in to view your favorite recipes</h3>
+            <p>Your saved favorites will appear here once you're logged in</p>
+            <div className="auth-links">
+              <Link to="/login" className="auth-link">Login</Link>
+              <span> or </span>
+              <Link to="/signup" className="auth-link">Sign Up</Link>
+            </div>
+          </div>
+        </div>
+      ) : saved.length === 0 ? (
         <div className="empty-state">
-          <h3>No Favorite Recipes Yet</h3>
-          <p>Browse recipes and click the star icon to add them to your favorites</p>
-          <button 
-            className="browse-recipes-btn"
-            onClick={() => window.location.href = '/recipes'}
-          >
-            Browse Recipes
-          </button>
+          <h3>Your Favorite Recipes Collection is Empty</h3>
+          <p>Discover delicious recipes and save your favorites to come back to later</p>
+          <Link to="/recipes" className="browse-recipes-btn">
+            Explore Recipes
+          </Link>
         </div>
       ) : (
         <div className="favorites-grid">
