@@ -3,10 +3,13 @@ import { getRecipes, toggleFavoriteRecipe } from '../api/recipes_service';
 import { Link } from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
 import './Recipes.css';
+import placeholderImage from '../assets/meal-mate-logo.png';
+import SearchBar from '../components/SearchBar';
 
 export default function Recipes() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [recipes, setRecipes] = useState([]);
+  const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState([]);
@@ -32,8 +35,10 @@ export default function Recipes() {
       try {
         const data = await getRecipes();
         setRecipes(data);
+        setFilteredRecipes(data); // Initialize filtered recipes
       } catch (error) {
         console.error('Error fetching recipes:', error);
+        setError('Failed to load recipes. Please try again later.');
       } finally {
         setLoading(false);
       }
