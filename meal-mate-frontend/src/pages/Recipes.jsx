@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { getRecipes, toggleFavoriteRecipe } from '../api/recipes_service';
 import { Link } from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
@@ -28,26 +28,42 @@ export default function Recipes() {
 
   // Sample placeholder recipes
   const placeholderRecipes = Array(15).fill().map((_, i) => ({
-    id: `placeholder-${i}`,
+    id: i + 1, // Use numeric IDs starting from 1
     title: `Recipe ${i+1}`,
     ingredients: 'Sample ingredients',
     image: placeholderImage
   }));
 
   useEffect(() => {
-    // First show placeholder recipes immediately
+    // Show placeholder recipes immediately
     setRecipes(placeholderRecipes);
-    setLoading(false);
-
-    // Then check login status and fetch real recipes if logged in
+    
     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
     setIsLoggedIn(loggedIn);
+
+    if (loggedIn) {
+      setLoading(true);
+      getRecipes()
+        .then(data => {
+          setRecipes(data);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Failed to fetch recipes:', error);
+          setLoading(false);
+          // Keep placeholder recipes as fallback
+        });
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const filteredRecipes = recipes.filter(recipe => 
-    recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    recipe.ingredients.toLowerCase().includes(searchTerm.toLowerCase())
-  ); // Ensure this line is properly closed
+  const filteredRecipes = useMemo(() => 
+    recipes.filter(recipe => 
+      recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      recipe.ingredients.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [recipes, searchTerm]
+  );
 
   return (
     <div className="recipes-container">
