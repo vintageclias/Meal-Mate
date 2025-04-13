@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getRecipes, toggleFavoriteRecipe } from '../api/recipes_service';
 import { Link } from 'react-router-dom';
+import RecipeCard from '../components/RecipeCard';
 import './Recipes.css';
 
 export default function Recipes() {
@@ -10,13 +11,13 @@ export default function Recipes() {
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState([]);
 
-  const handleFavorite = async (recipeId) => {
+  const handleFavorite = async (recipe) => {
     try {
-      await toggleFavoriteRecipe(recipeId);
+      await toggleFavoriteRecipe(recipe.id);
       setFavorites(prev => 
-        prev.includes(recipeId) 
-          ? prev.filter(id => id !== recipeId)
-          : [...prev, recipeId]
+        prev.includes(recipe.id) 
+          ? prev.filter(id => id !== recipe.id)
+          : [...prev, recipe.id]
       );
     } catch (error) {
       console.error('Error toggling favorite:', error);
@@ -77,19 +78,12 @@ export default function Recipes() {
           </div>
           <div className="recipe-grid">
             {filteredRecipes.map(recipe => (
-              <div key={recipe.id} className="recipe-card">
-                <h3>{recipe.title}</h3>
-                <h4>Ingredients</h4>
-                <p>{recipe.ingredients}</p>
-                <h4>Instructions</h4>
-                <p>{recipe.instructions}</p>
-                <button 
-                  className={`favorite-btn ${favorites.includes(recipe.id) ? 'favorited' : ''}`}
-                  onClick={() => handleFavorite(recipe.id)}
-                >
-                  {favorites.includes(recipe.id) ? '★' : '☆'}
-                </button>
-              </div>
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                onSave={handleFavorite}
+                isSaved={favorites.includes(recipe.id)}
+              />
             ))}
           </div>
         </>

@@ -8,6 +8,9 @@ from datetime import datetime
 from model import db, User, Recipe, Meal
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///meal_mate.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 # CORS configuration
 if os.environ.get('FLASK_ENV') == 'production':
@@ -29,4 +32,23 @@ else:
         }
     })
 
-[Rest of the file content remains exactly the same as in previous successful create_file attempt]
+# Initialize the database and migrations
+migrate = Migrate(app, db)
+
+# Define your routes here
+# Example route
+@app.route('/api/recipes', methods=['GET'])
+def get_recipes():
+    recipes = Recipe.query.all()
+    return jsonify([recipe.to_dict() for recipe in recipes])
+
+@app.route('/api/users/<int:user_id>/favorites', methods=['GET'])
+def get_user_favorites(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    favorites = user.favorites.all()
+    return jsonify([recipe.to_dict() for recipe in favorites])
+
+if __name__ == '__main__':
+    app.run(debug=True)
