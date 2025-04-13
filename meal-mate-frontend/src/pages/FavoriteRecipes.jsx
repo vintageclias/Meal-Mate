@@ -1,45 +1,52 @@
 import { useState, useEffect } from 'react';
 import ModernRecipeCard from '../components/ModernRecipeCard';
 import './FavoriteRecipes.css';
-import { getFavoriteRecipes } from '../api/recipes_service_v2';
+import { getFavoriteRecipes } from '../api/recipes_service';
+import { getCurrentUser } from '../api/authService';
 
 export default function FavoriteRecipes() {
-  const [saved, setSaved] = useState([]); // Initialize as empty array
+  const [saved, setSaved] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        // TODO: Replace with actual user ID when auth is implemented
-        const data = await getFavoriteRecipes('current-user');
-        setSaved(Array.isArray(data) ? data : []); // Ensure data is always an array
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const fetchFavorites = async () => {
+    setLoading(true);
+    try {
+      const user = getCurrentUser();
+      if (!user) {
+        throw new Error('User not authenticated');
       }
-    };
+      const data = await getFavoriteRecipes(user.id);
+      setSaved(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchFavorites();
   }, []);
 
-  const handleSave = (recipe) => {
-    setSaved(prev =>
-      prev.find(r => r.id === recipe.id)
-        ? prev.filter(r => r.id !== recipe.id)
-        : [...prev, recipe]
-    );
+  const handleSave = async (recipe) => {
+    try {
+      await fetchFavorites(); // Refresh the list after saving
+    } catch (err) {
+      setError(err.message);
+    }
   };
+
   if (loading) return <div className="favorites-container">Loading...</div>;
   if (error) return <div className="favorites-container">Error: {error}</div>;
 
   return (
     <div className="favorites-container">
       <h2 className="favorites-title">Your Favorite Recipes</h2>
-      {!saved || saved.length === 0 ? (
+      {saved.length === 0 ? (
         <div className="empty-state">
-          <h3>Select Your Favorite Recipes</h3>
-          <p>Browse recipes and click the heart icon to add them to your favorites</p>
+          <h3>No Favorite Recipes Yet</h3>
+          <p>Browse recipes and click the star icon to add them to your favorites</p>
           <button 
             className="browse-recipes-btn"
             onClick={() => window.location.href = '/recipes'}
@@ -53,7 +60,7 @@ export default function FavoriteRecipes() {
             <ModernRecipeCard
               key={recipe.id}
               recipe={recipe}
-              onSave={onSave}
+              onSave={handleSave}
               isSaved={true}
             />
           ))}

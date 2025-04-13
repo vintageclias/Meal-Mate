@@ -2,24 +2,50 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Light theme default variables */
+  --primary: #4361ee;
+  --secondary: #3a0ca3;
+  --text: #2b2d42;
+  --background: #f8f9fa;
+  --card-bg: #ffffff;
+  --border: #e0e0e0;
+  --success: #4caf50;
+  --error: #f44336;
+  --warning: #ff9800;
+  --info: #2196f3;
+}
+
+[data-theme="dark"] {
+  --primary: #3a56e8;
+  --secondary: #2a0a8a;
+  --text: #f8f9fa;
+  --background: #121212;
+  --card-bg: #1e1e1e;
+  --border: #333333;
+  --success: #388e3c;
+  --error: #d32f2f;
+  --warning: #f57c00;
+  --info: #1976d2;
+}
+
+body {
+  color: var(--text);
+  background-color: var(--background);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--primary);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--secondary);
 }
 
 body {
@@ -37,32 +63,35 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--card-bg);
+  color: var(--text);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.3s ease;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--primary);
+  background-color: var(--primary);
+  color: white;
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 4px auto var(--primary);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+.theme-toggle-btn:hover {
+  background-color: var(--primary);
+  color: white;
 }

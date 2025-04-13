@@ -4,16 +4,19 @@
   padding: 2rem;
   text-align: center;
   padding-top: 6rem; /* Extra padding to account for fixed navbar */
+  background-color: var(--background);
+  color: var(--text);
 }
 
 .logo {
   height: 6em;
   padding: 1.5em;
+  filter: brightness(0.9);
   will-change: filter;
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em var(--primary));
 }
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
@@ -54,7 +57,7 @@
 }
 
 .navbar {
-  background: #2c3e50;
+  background: var(--card-bg);
   padding: 1rem 2rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   display: flex;
@@ -65,6 +68,7 @@
   left: 0;
   right: 0;
   z-index: 1000;
+  border-bottom: 1px solid var(--border);
 }
 
 .nav-links {
@@ -120,7 +124,7 @@
 }
 
 .navbar a {
-  color: #ecf0f1;
+  color: var(--text);
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
@@ -130,8 +134,8 @@
 }
 
 .navbar a:hover {
-  background: #34495e;
-  color: #fff;
+  background: var(--primary);
+  color: white;
 }
 
 .navbar a::after {
@@ -141,7 +145,7 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: #3498db;
+  background: var(--primary);
   transition: width 0.3s ease;
 }
 
@@ -150,7 +154,7 @@
 }
 
 .navbar a.active {
-  color: #3498db;
+  color: var(--primary);
 }
 
 .navbar a.active::after {
@@ -172,16 +176,10 @@
   animation: fadeIn 0.3s ease-out;
 }
 
-.toast.light {
-  background-color: #ffffff;
-  color: #333333;
-  border: 1px solid #e0e0e0;
-}
-
-.toast.dark {
-  background-color: #333333;
-  color: #ffffff;
-  border: 1px solid #555555;
+.toast {
+  background-color: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 @keyframes fadeIn {

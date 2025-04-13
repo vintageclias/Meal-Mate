@@ -6,7 +6,7 @@ with app.app_context():
         title='Pasta Carbonara',
         ingredients='Pasta, Eggs, Cheese, Bacon',
         instructions='Cook pasta, mix with other ingredients',
-        user_id=5
+        user_id=1  # Assuming the test user is created with ID 1
     )
     db.session.add(r)
     db.session.commit()

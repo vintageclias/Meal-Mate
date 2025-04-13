@@ -1,5 +1,12 @@
 # Backend exclusions
 Meal-Mate/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+instance/
 
 # Frontend exclusions
 node_modules/
