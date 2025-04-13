@@ -34,7 +34,7 @@ export const getRecipeById = async (id) => {
 
 export const getFavoriteRecipes = async (userId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/users/${userId}/favorites`, {
+    const response = await axios.get(`${API_BASE_URL}/api/users/${userId}/favorites`, {
       headers: getAuthHeader()
     });
     return response.data;
@@ -47,7 +47,7 @@ export const getFavoriteRecipes = async (userId) => {
 export const toggleFavoriteRecipe = async (recipeId) => {
   try {
     const user = getCurrentUser();
-    const response = await axios.post(`${API_BASE_URL}/users/${user.id}/favorites`, 
+    const response = await axios.post(`${API_BASE_URL}/api/users/${user.id}/favorites`, 
       { recipeId },
       { headers: getAuthHeader() }
     );

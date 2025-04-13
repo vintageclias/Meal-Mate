@@ -26,33 +26,28 @@ export default function Recipes() {
     }
   };
 
+  // Sample placeholder recipes
+  const placeholderRecipes = Array(15).fill().map((_, i) => ({
+    id: `placeholder-${i}`,
+    title: `Recipe ${i+1}`,
+    ingredients: 'Sample ingredients',
+    image: placeholderImage
+  }));
+
   useEffect(() => {
+    // First show placeholder recipes immediately
+    setRecipes(placeholderRecipes);
+    setLoading(false);
+
+    // Then check login status and fetch real recipes if logged in
     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
     setIsLoggedIn(loggedIn);
-    
-    const fetchRecipes = async () => {
-      try {
-        const data = await getRecipes();
-        setRecipes(data);
-      } catch (error) {
-        console.error('Error fetching recipes:', error);
-        setError('Failed to load recipes. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    if (loggedIn) {
-      fetchRecipes();
-    } else {
-      setLoading(false);
-    }
   }, []);
 
-  const filteredRecipes = recipes.filter(recipe =>
+  const filteredRecipes = recipes.filter(recipe => 
     recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     recipe.ingredients.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ); // Ensure this line is properly closed
 
   return (
     <div className="recipes-container">

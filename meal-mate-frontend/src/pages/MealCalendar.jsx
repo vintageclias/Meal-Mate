@@ -1,105 +1,73 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './MealCalendar.css';
 import { getCurrentUser } from '../api/authService';
-import { getCalendar, saveCalendar } from '../api/recipes_service';
 import DaySelectionModal from '../components/DaySelectionModal';
 import MealItem from '../components/MealItem';
 import MealDropTarget from '../components/MealDropTarget';
 import MealModal from './MealModal';
 
-export default function MealCalendar({ mealData }) {
+const randomMeals = [
+  { name: 'Pasta Carbonara', calories: 650, image: '/placeholder-food.jpg' },
+  { name: 'Vegetable Stir Fry', calories: 420, image: '/placeholder-food.jpg' },
+  { name: 'Chicken Salad', calories: 320, image: '/placeholder-food.jpg' },
+  { name: 'Beef Burger', calories: 780, image: '/placeholder-food.jpg' },
+  { name: 'Fruit Smoothie', calories: 250, image: '/placeholder-food.jpg' },
+  { name: 'Pancakes', calories: 380, image: '/placeholder-food.jpg' },
+  { name: 'Grilled Salmon', calories: 450, image: '/placeholder-food.jpg' },
+  { name: 'Vegetable Soup', calories: 200, image: '/placeholder-food.jpg' }
+];
+
+export default function MealCalendar() {
   const currentUser = getCurrentUser();
   const [searchTerm, setSearchTerm] = useState('');
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const [assignedMeals, setAssignedMeals] = useState(
     daysOfWeek.reduce((acc, day) => ({ ...acc, [day]: [] }), {})
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // Load saved calendar on mount
-  useEffect(() => {
-    if (currentUser) {
-      setIsLoading(true);
-      getCalendar(currentUser.id)
-        .then(data => {
-          setAssignedMeals(data);
-          setIsLoading(false);
-        })
-        .catch(err => {
-          console.error('Failed to load calendar:', err);
-          setError('Failed to load calendar data');
-          setIsLoading(false);
-        });
-    }
-  }, [currentUser]);
   const [expandedDay, setExpandedDay] = useState(null);
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [showDayModal, setShowDayModal] = useState(false);
   const [mealToAdd, setMealToAdd] = useState(null);
 
-  const filteredMeals = Object.keys(mealData || {}).filter(meal =>
-    meal.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMeals = randomMeals.filter(meal =>
+    meal.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDrop = async (day, meal) => {
+  const handleDrop = (day, meal) => {
+    const mealToAdd = typeof meal === 'object' ? meal : randomMeals.find(m => m.name === meal);
     const updatedMeals = {
       ...assignedMeals,
-      [day]: [...(assignedMeals[day] || []), meal]
+      [day]: [...(assignedMeals[day] || []), mealToAdd]
     };
     setAssignedMeals(updatedMeals);
-    
-    if (currentUser) {
-      try {
-        await saveCalendar(currentUser.id, updatedMeals);
-      } catch (err) {
-        console.error('Failed to save calendar:', err);
-        setError('Failed to save calendar changes');
-      }
-    }
   };
 
-  const clearCalendar = async () => {
+  const clearCalendar = () => {
     const emptyCalendar = daysOfWeek.reduce((acc, day) => ({ ...acc, [day]: [] }), {});
     setAssignedMeals(emptyCalendar);
-    
-    if (currentUser) {
-      try {
-        await saveCalendar(currentUser.id, emptyCalendar);
-      } catch (err) {
-        console.error('Failed to clear calendar:', err);
-        setError('Failed to clear calendar');
-      }
-    }
   };
 
   const toggleDay = (day) => {
     setExpandedDay(prev => prev === day ? null : day);
   };
 
+  console.log('Current user:', currentUser);
+  console.log('Random meals:', randomMeals);
+  
   return (
     <div className="calendar-container">
       <div className="meal-selection">
-        <h2>Meal Library</h2>
-        {currentUser ? (
-          <div>
-            <h3 className="welcome-message">Welcome, {currentUser.username}!</h3>
-            <p className="search-instruction">Search for meals below to plan your week</p>
-          </div>
-        ) : (
-          <div className="login-prompt" style={{textAlign: 'center', padding: '20px'}}>
-            <h3 style={{color: '#4CAF50', fontSize: '2em', marginBottom: '15px'}}>Welcome to MealMate!</h3>
-            <p style={{fontSize: '1.2em', marginBottom: '20px'}}>Please log in to plan your meals for the week</p>
+        <h2>Meal Planner</h2>
+        {!currentUser ? (
+          <div className="login-prompt">
+            <h3>Welcome to Meal Planner</h3>
+            <p>Login to create your personalized meal plan for the week</p>
+            <p>Plan your meals, track nutrition, and save your favorite recipes</p>
             <img 
               src="/placeholder-food.jpg" 
-              alt="Welcome Illustration" 
-              style={{ 
-                width: '100%', 
-                maxWidth: '400px', 
-                marginBottom: '20px',
-                borderRadius: '8px'
-              }} 
+              alt="Food illustration"
+              className="welcome-image"
             />
             <div className="auth-links">
               <Link to="/login" className="auth-link">Login</Link>
@@ -107,11 +75,13 @@ export default function MealCalendar({ mealData }) {
               <Link to="/signup" className="auth-link">Sign Up</Link>
             </div>
           </div>
-        )}
-
-        {currentUser && (
+        ) : (
           <>
-            <div className="search-container">
+            <div>
+              <h3>Welcome back, {currentUser.username}!</h3>
+              <p>Drag meals to your calendar</p>
+
+              <div className="search-container">
               <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -129,14 +99,14 @@ export default function MealCalendar({ mealData }) {
               {filteredMeals.map((meal, i) => (
                 <div className="meal-card" key={i}>
                   <img 
-                    src={`${mealData[meal]?.image}?ixlib=rb-1.2.1&auto=format&fit=crop&w=150&h=150`}
-                    alt={meal}
+                    src={meal.image}
+                    alt={meal.name}
                     className="meal-thumbnail"
-                    onClick={() => setSelectedMeal({name: meal, ...mealData[meal]})}
+                    onClick={() => setSelectedMeal(meal)}
                   />
                   <div className="meal-info">
-                    <h4>{meal}</h4>
-                    <p>{mealData[meal]?.calories} kcal</p>
+                    <h4>{meal.name}</h4>
+                    <p>{meal.calories} kcal</p>
                     <button 
                       className="add-to-calendar-btn"
                       onClick={(e) => {
@@ -150,6 +120,7 @@ export default function MealCalendar({ mealData }) {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
           </>
         )}
@@ -159,9 +130,7 @@ export default function MealCalendar({ mealData }) {
         <MealModal meal={selectedMeal} onClose={() => setSelectedMeal(null)} />
       )}
 
-      {isLoading && <div className="loading-message">Loading your meal plan...</div>}
-      {error && <div className="error-message">{error}</div>}
-      {currentUser && !isLoading && (
+      {currentUser && (
         <>
           <div className="calendar-grid">
             {daysOfWeek.map(day => (
@@ -180,7 +149,23 @@ export default function MealCalendar({ mealData }) {
                   <div className="day-meals">
                     {assignedMeals[day].length > 0 ? (
                       assignedMeals[day].map((meal, i) => (
-                        <MealItem key={i} name={meal} onDrop={handleDrop} />
+                        <div className="calendar-meal-card" key={i}>
+                          <img 
+                            src={meal.image} 
+                            alt={meal.name}
+                            className="calendar-meal-image"
+                          />
+                          <div className="calendar-meal-info">
+                            <h4>{meal.name}</h4>
+                            <p>{meal.calories} kcal</p>
+                          </div>
+                          <button 
+                            className="remove-meal-btn"
+                            onClick={() => handleDrop(day, meal)}
+                          >
+                            ×
+                          </button>
+                        </div>
                       ))
                     ) : (
                       <div className="empty-state">

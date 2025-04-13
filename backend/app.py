@@ -22,7 +22,7 @@ if os.environ.get('FLASK_ENV') == 'production':
 else:
     CORS(app, resources={
         r"/*": {
-            "origins": ["http://localhost:5173", "http://localhost:5176", "http://localhost:5177", "http://localhost:5178"],
+            "origins": ["http://localhost:5173", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177", "http://localhost:5178"],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
