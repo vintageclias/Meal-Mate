@@ -15,7 +15,7 @@ class User(db.Model):
         lazy='dynamic'
     )
 
-# Association table for user favorites
+
 user_favorites = db.Table('user_favorites',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
     db.Column('recipe_id', db.Integer, db.ForeignKey('recipe.id'), primary_key=True)
@@ -34,7 +34,7 @@ class Meal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
-    day_of_week = db.Column(db.String(10))  # Monday-Sunday
+    day_of_week = db.Column(db.String(10)) 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
     plan_id = db.Column(db.Integer, db.ForeignKey('meal_plan.id'))
