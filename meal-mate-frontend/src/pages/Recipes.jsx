@@ -26,16 +26,16 @@ export default function Recipes() {
     }
   };
 
-  // Sample placeholder recipes
+  
   const placeholderRecipes = Array(15).fill().map((_, i) => ({
-    id: i + 1, // Use numeric IDs starting from 1
+    id: i + 1, 
     title: `Recipe ${i+1}`,
     ingredients: 'Sample ingredients',
     image: placeholderImage
   }));
 
   useEffect(() => {
-    // Show placeholder recipes immediately
+    
     setRecipes(placeholderRecipes);
     
     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -51,7 +51,7 @@ export default function Recipes() {
         .catch(error => {
           console.error('Failed to fetch recipes:', error);
           setLoading(false);
-          // Keep placeholder recipes as fallback
+          
         });
     } else {
       setLoading(false);

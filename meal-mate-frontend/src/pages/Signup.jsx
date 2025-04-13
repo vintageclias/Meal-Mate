@@ -22,7 +22,7 @@ export default function Signup({ onLogin }) {
       console.log('Registration response:', result);
       
       if (result && result.message === "User registered successfully") {
-        // Auto-login after successful registration
+        
         const loginResult = await login({ email, password });
         if (loginResult && loginResult.message === "Login successful") {
           onLogin({

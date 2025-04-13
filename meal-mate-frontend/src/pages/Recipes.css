@@ -1,4 +1,4 @@
-/* Space-optimized Recipe Page Styles */
+
 .recipes-container {
   max-width: 1800px;
   margin: 0 auto;
@@ -55,7 +55,7 @@ h1 {
   }
 }
 
-/* Existing styles below remain unchanged */
+
 .login-prompt {
   text-align: center;
   margin: 2rem auto;
@@ -63,4 +63,4 @@ h1 {
   padding: 1.5rem;
 }
 
-/* ... other existing styles ... */
+

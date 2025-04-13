@@ -9,7 +9,6 @@ import Signup from './pages/Signup';
 import Profile from './pages/Profile';
 import MealCalendar from './pages/MealCalendar';
 import RecipeDetails from './components/RecipeDetails';
-import FavoriteRecipes from './pages/FavoriteRecipes';
 import About from './pages/About';
 import './App.css';
 
@@ -80,7 +79,6 @@ function App() {
           <div className="nav-links">
             <Link to="/">Home</Link>
             <Link to="/recipes">Recipes</Link>
-            <Link to="/favorites">Favorites</Link>
             <Link to="/login">Login</Link>
             <Link to="/profile">Profile</Link>
             <Link to="/calendar">Meal Calendar</Link>
@@ -125,7 +123,6 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/calendar" element={<MealCalendar />} />
           <Route path="/recipes/:id" element={<RecipeDetails />} />
-          <Route path="/favorites" element={<FavoriteRecipes saved={[]} onSave={() => {}} />} />
           <Route path="/about" element={<About />} />
         </Routes>
         

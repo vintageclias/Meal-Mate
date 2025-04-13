@@ -93,11 +93,11 @@ export default function Profile() {
         throw new Error(`${errorMsg}${details}`);
       }
 
-      // Update profile with response data
+  
       setProfile(prev => ({
         ...prev,
         name: responseData.user?.username || prev.name,
-        dietaryPreferences: prev.dietaryPreferences // Keep existing preferences
+        dietaryPreferences: prev.dietaryPreferences
       }));
       
       setIsEditing(false);

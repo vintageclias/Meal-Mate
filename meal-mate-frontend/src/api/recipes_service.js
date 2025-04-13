@@ -47,11 +47,13 @@ export const getFavoriteRecipes = async (userId) => {
 export const toggleFavoriteRecipe = async (recipeId) => {
   try {
     const user = getCurrentUser();
+    if (!user) throw new Error('User not logged in');
+    
     const response = await axios.post(`${API_BASE_URL}/api/users/${user.id}/favorites`, 
       { recipeId },
       { headers: getAuthHeader() }
     );
-    return response.data;
+    return response.data.is_favorite;
   } catch (error) {
     console.error(`Failed to toggle favorite for recipe ${recipeId}:`, error);
     throw error;

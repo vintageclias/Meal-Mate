@@ -179,6 +179,42 @@ def delete_recipe(recipe_id):
     db.session.commit()
     return jsonify(message="Recipe deleted successfully")
 
+# ---------------- FAVORITE ROUTES ---------------- #
+
+@app.route('/api/users/<int:user_id>/favorites', methods=['GET'])
+def get_user_favorites(user_id):
+    user = User.query.get_or_404(user_id)
+    favorites = user.favorites.all()
+    favorite_list = [{
+        'id': recipe.id,
+        'title': recipe.title,
+        'ingredients': recipe.ingredients,
+        'instructions': recipe.instructions
+    } for recipe in favorites]
+    return jsonify(favorite_list)
+
+@app.route('/api/users/<int:user_id>/favorites', methods=['POST'])
+def toggle_favorite(user_id):
+    data = request.get_json()
+    if not data or 'recipe_id' not in data:
+        return jsonify(error="Missing recipe_id"), 400
+
+    user = User.query.get_or_404(user_id)
+    recipe = Recipe.query.get_or_404(data['recipe_id'])
+
+    if recipe in user.favorites:
+        user.favorites.remove(recipe)
+        action = "removed from"
+    else:
+        user.favorites.append(recipe)
+        action = "added to"
+
+    db.session.commit()
+    return jsonify({
+        "message": f"Recipe {action} favorites",
+        "is_favorite": action == "added to"
+    }), 200
+
 # ---------------- MEAL ROUTES ---------------- #
 
 @app.route('/meals', methods=['GET'])

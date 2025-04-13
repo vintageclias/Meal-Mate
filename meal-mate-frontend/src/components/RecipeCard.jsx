@@ -1,9 +1,18 @@
 import { Link } from 'react-router-dom';
 import placeholderImage from '../assets/meal-mate-logo.png';
+import './RecipeCard.css';
 
 export default function RecipeCard({ recipe, onSave, isSaved }) {
+  const handleSaveClick = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (recipe.id && !isNaN(Number(recipe.id))) {
+      onSave(recipe);
+    }
+  };
+
   return (
-    <div className="recipe-card" aria-label={`Recipe: ${recipe.title}`}>
+    <div className="recipe-card">
       <div className="recipe-image-container">
         <img 
           src={recipe.image || placeholderImage} 
@@ -20,26 +29,26 @@ export default function RecipeCard({ recipe, onSave, isSaved }) {
       </div>
       
       <div className="recipe-content">
-        <h3 className="recipe-title">{recipe.title}</h3>
+        <h3>{recipe.name || recipe.title}</h3>
         <div className="recipe-meta">
-          {recipe.country && <span className="country-flag">🌍 {recipe.country}</span>}
-          {recipe.rating && <span className="recipe-rating">⭐ {recipe.rating}</span>}
+          {recipe.country && <span> {recipe.country}</span>}
+          {recipe.totalTime && <span> {recipe.totalTime}</span>}
         </div>
         
         <div className="recipe-actions">
           <Link 
-            to={`/recipes/${recipe.id}`} 
-            className="view-more-btn"
-            aria-label={`View details of ${recipe.title}`}
+            to={`/recipes/${recipe.id}`}
+            className="view-btn"
           >
             View Details
           </Link>
           <button 
-            onClick={() => onSave(recipe)}
+            onClick={handleSaveClick}
             className={`save-btn ${isSaved ? 'saved' : ''}`}
-            aria-label={isSaved ? "Remove from saved" : "Save recipe"}
+            disabled={!recipe.id || isNaN(Number(recipe.id))}
           >
             {isSaved ? "❤️ Saved" : "🤍 Save"}
+            <span className="tooltip">{isSaved ? "Remove from favorites" : "Add to favorites"}</span>
           </button>
         </div>
       </div>
