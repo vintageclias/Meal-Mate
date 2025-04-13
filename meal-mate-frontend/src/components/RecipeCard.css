@@ -3,16 +3,22 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
-  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: auto;
   display: flex;
   flex-direction: column;
   margin: 1rem;
-  width: 280px;
+  width: 100%;
 }
 
 .recipe-card:hover {
   transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.featured-recipe {
+  border: 2px solid #4361ee;
+  background: rgba(240, 240, 240, 0.5);
 }
 
 .recipe-image-container {

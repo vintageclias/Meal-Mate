@@ -76,7 +76,7 @@ def login():
             if not data or 'password' not in data:
                 return jsonify({"error": "Password is required"}), 400
 
-            # Accept multiple field names for username/email
+           
             username_or_email = data.get('username_or_email') or data.get('email') or data.get('username')
             if not username_or_email:
                 return jsonify({"error": "Username or email is required"}), 400
@@ -105,15 +105,16 @@ def login():
 @app.route('/recipes', methods=['GET'])
 def get_recipes():
     recipes = Recipe.query.all()
-    return jsonify([
-        {
+    recipe_list = []
+    for r in recipes:
+        recipe_list.append({
             'id': r.id,
             'title': r.title,
             'ingredients': r.ingredients,
             'instructions': r.instructions,
             'user_id': r.user_id
-        } for r in recipes
-    ])
+        })
+    return jsonify(recipe_list)
 
 @app.route('/recipes', methods=['POST'])
 def add_recipe():

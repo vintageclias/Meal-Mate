@@ -1,6 +1,13 @@
+.search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
 .search-bar {
   width: 100%;
   padding: 0.8rem 1.5rem;
+  padding-right: 2.5rem;
   font-size: 1rem;
   border: 1px solid #e0e0e0;
   border-radius: 25px;
@@ -14,6 +21,24 @@
   border-color: #3498db;
   background-color: white;
   box-shadow: 0 0 0 3px rgba(52,152,219,0.2);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.clear-search-btn:hover {
+  color: #666;
 }
 
 .search-bar::placeholder {
