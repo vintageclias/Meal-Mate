@@ -8,6 +8,10 @@ from datetime import datetime
 from model import db, User, Recipe, Meal
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True, origins=[
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+])
 
 # CORS configuration
 if os.environ.get('FLASK_ENV') == 'production':

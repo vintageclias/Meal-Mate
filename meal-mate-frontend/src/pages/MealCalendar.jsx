@@ -161,6 +161,27 @@ export default function MealCalendar() {
 
       {currentUser && (
         <>
+          {/* ✅ Weekly Overview with Images */}
+          <div className="meal-calendar-simple">
+            <h3>Weekly Meal Overview</h3>
+            <div className="meal-calendar">
+              {daysOfWeek.map((day) => (
+                <div key={day} className="day-column">
+                  <h4>{day}</h4>
+                  {Array.isArray(assignedMeals[day]) &&
+                    assignedMeals[day].map((meal, index) => (
+                      <img
+                        key={index}
+                        src={meal.image}
+                        alt={meal.name}
+                        style={{ width: "80px", height: "80px", margin: "4px", borderRadius: "8px" }}
+                      />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="calendar-grid">
             {daysOfWeek.map(day => (
               <div className="day-card" key={day}>
